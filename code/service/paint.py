@@ -2,13 +2,17 @@ import pandas
 import matplotlib
 import mpl_finance
 import matplotlib.pyplot as plt
+import pymysql
 
 matplotlib.style.use('ggplot')
 
 
 def stock_price_plot(ticker):
-    history = pandas.read_csv('../../data/IntradayUS/' + ticker + '.csv', parse_dates=True, index_col=0)
-
+    # history = pandas.read_csv('../../data/IntradayUS/' + ticker + '.csv', parse_dates=True, index_col=0)
+    history = pandas.read_sql_query(
+        sql="select timestamp,open,high,low,close,volume from intraday_us where symbol='{0}'".format(ticker),
+        con=pymysql.connect("rm-2ze0gur4knf5f648joo.mysql.rds.aliyuncs.com",
+                            "zhanglifan", "Larry@1987", "stock_trade"), parse_dates=True, index_col='timestamp')
     close = history['close']
     close = close.reset_index()
     close['timestamp'] = close['timestamp'].map(matplotlib.dates.date2num)
@@ -28,4 +32,4 @@ def stock_price_plot(ticker):
     plt.show()
 
 
-stock_price_plot('JD')
+stock_price_plot('TXG')
